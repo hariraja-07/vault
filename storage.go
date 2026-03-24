@@ -26,9 +26,9 @@ func getVaultFilePath() string {
 	return filepath.Join(vaultDir, vaultFileName)
 }
 
-func loadData() map[string]string {
+func loadData() map[string]interface{} {
 	filePath := getVaultFilePath()
-	data := make(map[string]string)
+	data := make(map[string]interface{})
 
 	file, err := os.ReadFile(filePath)
 
@@ -51,7 +51,7 @@ func loadData() map[string]string {
 	return data
 }
 
-func saveData(data map[string]string) {
+func saveData(data map[string]interface{}) {
 	filePath := getVaultFilePath()
 
 	file, err := json.MarshalIndent(data, "", "  ")
