@@ -31,7 +31,7 @@ func main() {
 		handleList(data)
 
 	case "help":
-		handleHelp(args)
+		handleHelp()
 
 	default:
 		fmt.Println("Unknown command")
@@ -40,7 +40,7 @@ func main() {
 
 func handleSet(args []string, data map[string]interface{}) {
 	if len(args) < 4 {
-		fmt.Println("Usage: vault set <key> <value>")
+		handleHelp("set")
 		return
 	}
 
@@ -55,7 +55,7 @@ func handleSet(args []string, data map[string]interface{}) {
 
 func handleGet(args []string, data map[string]interface{}) {
 	if len(args) < 3 {
-		fmt.Println("Usage: vault get <key>")
+		handleHelp("get")
 		return
 	}
 	key := args[2]
@@ -69,7 +69,7 @@ func handleGet(args []string, data map[string]interface{}) {
 
 func handleRemove(args []string, data map[string]interface{}) {
 	if len(args) < 3 {
-		fmt.Println("Usage: vault remove <key>")
+		handleHelp("remove")
 		return
 	}
 
@@ -104,9 +104,19 @@ func handleList(data map[string]interface{}) {
 	}
 }
 
-func handleHelp(args []string) {
-	fmt.Println("Vault commmands:")
-	for name, cmd := range commands {
-		fmt.Printf("%-10s : %s\n", name, cmd.Desc)
+func handleHelp(command ...string) {
+	if len(command) == 0 {
+		fmt.Println("Vault commmands:")
+		for name, cmd := range commands {
+			fmt.Printf("%-10s : %s\n", name, cmd.Desc)
+		}
+		return
+	}
+
+	cmdName := command[0]
+	if cmd, ok := commands[cmdName]; ok {
+		fmt.Printf("Usage: %s\n", cmd.Usage)
+	} else {
+		fmt.Println("Unknown command:", cmdName)
 	}
 }
