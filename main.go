@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -63,8 +64,21 @@ func main() {
 			return
 		}
 
-		for k, v := range data {
-			fmt.Printf("%s: %s\n", k, v)
+		var keys []string
+		for key := range data {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		fmt.Println("Vault")
+		for i, key := range keys {
+			value := data[key]
+
+			if i == len(keys)-1 {
+				fmt.Printf("└── %s: %v\n", key, value)
+			} else {
+				fmt.Printf("├── %s: %v\n", key, value)
+			}
 		}
 
 	default:
