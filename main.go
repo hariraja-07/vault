@@ -30,6 +30,9 @@ func main() {
 	case "list":
 		handleList(data)
 
+	case "help":
+		handleHelp(args)
+
 	default:
 		fmt.Println("Unknown command")
 	}
@@ -98,5 +101,12 @@ func handleList(data map[string]interface{}) {
 		} else {
 			fmt.Printf("├── %s\n", key)
 		}
+	}
+}
+
+func handleHelp(args []string) {
+	fmt.Println("Vault commmands:")
+	for name, cmd := range commands {
+		fmt.Printf("%-10s : %s\n", name, cmd.Desc)
 	}
 }
