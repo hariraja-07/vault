@@ -37,7 +37,7 @@ func main() {
 			fmt.Println("Usage: vault get <key>")
 			return
 		}
-		key := args[3]
+		key := args[2]
 		value, exists := data[key]
 		if exists {
 			fmt.Println(value)
