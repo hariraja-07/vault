@@ -72,12 +72,11 @@ func main() {
 
 		fmt.Println("Vault")
 		for i, key := range keys {
-			value := data[key]
 
 			if i == len(keys)-1 {
-				fmt.Printf("└── %s: %v\n", key, value)
+				fmt.Printf("└── %s\n", key)
 			} else {
-				fmt.Printf("├── %s: %v\n", key, value)
+				fmt.Printf("├── %s\n", key)
 			}
 		}
 
