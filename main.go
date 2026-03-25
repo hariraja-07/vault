@@ -31,7 +31,11 @@ func main() {
 		handleList(data)
 
 	case "help":
-		handleHelp()
+		if len(args) > 2 {
+			handleHelp(args[2])
+		} else {
+			handleHelp()
+		}
 
 	default:
 		fmt.Println("Unknown command")
@@ -40,7 +44,7 @@ func main() {
 
 func handleSet(args []string, data map[string]interface{}) {
 	if len(args) < 4 {
-		handleHelp("set")
+		handleHelp("set", "short")
 		return
 	}
 
@@ -55,7 +59,7 @@ func handleSet(args []string, data map[string]interface{}) {
 
 func handleGet(args []string, data map[string]interface{}) {
 	if len(args) < 3 {
-		handleHelp("get")
+		handleHelp("get", "short")
 		return
 	}
 	key := args[2]
@@ -69,7 +73,7 @@ func handleGet(args []string, data map[string]interface{}) {
 
 func handleRemove(args []string, data map[string]interface{}) {
 	if len(args) < 3 {
-		handleHelp("remove")
+		handleHelp("remove", "short")
 		return
 	}
 
@@ -114,9 +118,20 @@ func handleHelp(command ...string) {
 	}
 
 	cmdName := command[0]
-	if cmd, ok := commands[cmdName]; ok {
-		fmt.Printf("Usage: %s\n", cmd.Usage)
-	} else {
+
+	cmd, ok := commands[cmdName]
+
+	if !ok {
 		fmt.Println("Unknown command:", cmdName)
+		return
 	}
+
+	if len(command) > 1 && command[1] == "short" {
+		fmt.Printf("Usage: %s\n", cmd.Usage)
+		return
+	}
+
+	fmt.Printf("Command: %s\n", cmdName)
+	fmt.Printf("Description: %s\n", cmd.Desc)
+	fmt.Printf("Usage: %s\n", cmd.Usage)
 }
