@@ -179,11 +179,48 @@ func handleList(data map[string]interface{}) {
 
 	fmt.Println("Vault")
 	for i, key := range keys {
+		value := data[key]
 
-		if i == len(keys)-1 {
-			fmt.Printf("└── %s\n", key)
+		isLast := i == len(keys)-1
+
+		if groupMap, ok := value.(map[string]interface{}); ok {
+			//print group
+			if isLast {
+				fmt.Printf("└── %s\n", key)
+			} else {
+				fmt.Printf("├── %s\n", key)
+			}
+
+			var subKeys []string
+			for subKey := range groupMap {
+				subKeys = append(subKeys, subKey)
+			}
+			sort.Strings(subKeys)
+
+			for j, subKey := range subKeys {
+				isSubLast := j == len(subKeys)-1
+
+				if isLast {
+					if isSubLast {
+						fmt.Printf("    └── %s\n", subKey)
+					} else {
+						fmt.Printf("    ├── %s\n", subKey)
+					}
+				} else {
+					if isSubLast {
+						fmt.Printf("│   └── %s\n", subKey)
+					} else {
+						fmt.Printf("│   ├── %s\n", subKey)
+					}
+				}
+			}
 		} else {
-			fmt.Printf("├── %s\n", key)
+			//normal keys
+			if isLast {
+				fmt.Printf("└── %s\n", key)
+			} else {
+				fmt.Printf("├── %s\n", key)
+			}
 		}
 	}
 }
