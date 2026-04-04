@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 )
 
 func main() {
@@ -51,9 +52,22 @@ func handleSet(args []string, data map[string]interface{}) {
 	key := args[2]
 	value := args[3]
 
-	data[key] = value
-	saveData(data)
+	if strings.Contains(key, "/") {
+		parts := strings.SplitN(key, "/", 2)
+		group := parts[0]
+		subKey := parts[1]
 
+		if _, ok := data[group]; !ok {
+			data[group] = map[string]interface{}{}
+		}
+
+		groupMap := data[group].(map[string]interface{})
+		groupMap[subKey] = value
+	} else {
+		data[key] = value
+	}
+
+	saveData(data)
 	fmt.Println("Saved:", key)
 }
 
@@ -63,12 +77,41 @@ func handleGet(args []string, data map[string]interface{}) {
 		return
 	}
 	key := args[2]
-	value, exists := data[key]
-	if exists {
-		fmt.Println(value)
-	} else {
-		fmt.Println("Key not found")
+
+	// grouped key
+	if strings.Contains(key, "/") {
+
+		if strings.Count(key, "/") > 1 {
+			fmt.Println("Error: Only one level grouping allowed (group/key)")
+			return
+		}
+
+		parts := strings.SplitN(key, "/", 2)
+		group := parts[0]
+		subKey := parts[1]
+
+		groupMap, ok := data[group].(map[string]interface{})
+		if !ok {
+			fmt.Println("Group not found")
+			return
+		}
+		val, ok := groupMap[subKey]
+		if !ok {
+			fmt.Println("Key not found")
+			return
+		}
+
+		fmt.Println(val)
+		return
 	}
+
+	// only key
+	val, ok := data[key]
+	if !ok {
+		fmt.Println("Key not found")
+		return
+	}
+	fmt.Println(val)
 }
 
 func handleRemove(args []string, data map[string]interface{}) {
