@@ -119,9 +119,46 @@ func handleRemove(args []string, data map[string]interface{}) {
 		handleHelp("remove", "short")
 		return
 	}
-
 	key := args[2]
 
+	//grouped key
+	if strings.Contains(key, "/") {
+
+		if strings.Count(key, "/") > 1 {
+			fmt.Println("Error: Only one level grouping allowed (group/key)")
+			return
+		}
+
+		parts := strings.SplitN(key, "/", 2)
+		group := parts[0]
+		subKey := parts[1]
+
+		groupMap, ok := data[group].(map[string]interface{})
+		if !ok {
+			fmt.Println("Group not found")
+			return
+		}
+
+		if _, exists := groupMap[subKey]; !exists {
+			fmt.Println("Key not found")
+			return
+		}
+		delete(groupMap, subKey)
+
+		if len(groupMap) == 0 {
+			delete(data, group)
+		}
+
+		saveData(data)
+		fmt.Println("Deleted:", key)
+		return
+	}
+
+	//normal key
+	if _, exists := data[key]; !exists {
+		fmt.Println("Key not found")
+		return
+	}
 	delete(data, key)
 	saveData(data)
 
