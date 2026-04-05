@@ -67,3 +67,8 @@ func SaveData(data map[string]interface{}) {
 		os.Exit(1)
 	}
 }
+
+func HasKey(data map[string]interface{}, key string) bool {
+	_, exists := data[key]
+	return exists
+}
