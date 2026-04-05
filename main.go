@@ -30,11 +30,16 @@ func main() {
 
 	case "list":
 		full := false
+		group := ""
 
-		if len(args) > 2 && args[2] == "--full" {
-			full = true
+		for _, arg := range args[2:] {
+			if arg == "--full" {
+				full = true
+			} else {
+				group = arg
+			}
 		}
-		handleList(data, full)
+		handleList(data, full, group)
 
 	case "help":
 		if len(args) > 2 {
@@ -170,7 +175,42 @@ func handleRemove(args []string, data map[string]interface{}) {
 	fmt.Println("Deleted :", key)
 }
 
-func handleList(data map[string]interface{}, full bool) {
+func handleList(data map[string]interface{}, full bool, group string) {
+	if group != "" {
+		groupMap, ok := data[group].(map[string]interface{})
+		if !ok {
+			fmt.Println("Group not found")
+			return
+		}
+
+		if len(groupMap) == 0 {
+			fmt.Println("Group is empty")
+			return
+		}
+
+		var keys []string
+		for key := range groupMap {
+			keys = append(keys, key)
+		}
+
+		sort.Strings(keys)
+
+		fmt.Println(group + "/")
+
+		for i, key := range keys {
+			isLast := i == len(keys)-1
+
+			prefix := "├── "
+			if isLast {
+				prefix = "└── "
+			}
+
+			fmt.Printf("%s%s\n", prefix, key)
+		}
+
+		return
+	}
+
 	if len(data) == 0 {
 		fmt.Println("No data stored")
 		return
