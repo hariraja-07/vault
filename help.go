@@ -1,29 +1,53 @@
 package main
 
 type Command struct {
-	Usage string
-	Desc  string
+	Usage    string
+	Desc     string
+	Examples []string
 }
 
 var commands = map[string]Command{
 	"set": {
 		Usage: "vault set <key> <value>",
-		Desc:  "Set a key with a value",
+		Desc:  "Set a key-value pair",
+		Examples: []string{
+			"vault set api_key sk_live_xxxxx",
+			"vault set work/db_password secret123",
+			"vault set aws/secret_key abc123",
+		},
 	},
 	"get": {
 		Usage: "vault get <key>",
 		Desc:  "Get the value of a key",
+		Examples: []string{
+			"vault get api_key",
+			"vault get work/db_password",
+		},
 	},
 	"remove": {
 		Usage: "vault remove <key>",
-		Desc:  "Delete a key",
+		Desc:  "Delete a key or group",
+		Examples: []string{
+			"vault remove api_key",
+			"vault remove work/db_password",
+			"vault remove db          # removes entire group",
+		},
 	},
 	"list": {
-		Usage: "vault list",
-		Desc:  "List all stored keys",
+		Usage: "vault list [group] [--full]",
+		Desc:  "List all secrets or secrets in a specific group",
+		Examples: []string{
+			"vault list",
+			"vault list --full        # show keys within groups",
+			"vault list work          # show keys in 'work' group only",
+		},
 	},
 	"help": {
-		Usage: "vault help",
-		Desc:  "show help for all commands",
+		Usage: "vault help [command]",
+		Desc:  "Show help for commands",
+		Examples: []string{
+			"vault help",
+			"vault help set",
+		},
 	},
 }

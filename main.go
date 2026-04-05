@@ -11,7 +11,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		fmt.Println("Usage: vault <command> [arguments]")
+		handleHelp()
 		return
 	}
 
@@ -267,11 +267,20 @@ func handleList(data map[string]interface{}, full bool, group string) {
 }
 
 func handleHelp(command ...string) {
-	if len(command) == 0 {
-		fmt.Println("Vault commmands:")
+	if len(command) == 0 || (len(command) > 0 && command[0] == "help") {
+		fmt.Println()
+		fmt.Println("vault - A simple CLI-based key-value storage tool")
+		fmt.Println()
+		fmt.Println("Usage:")
+		fmt.Println("  vault <command> [arguments]")
+		fmt.Println()
+		fmt.Println("Commands:")
 		for name, cmd := range commands {
-			fmt.Printf("%-10s : %s\n", name, cmd.Desc)
+			fmt.Printf("  %-10s %s\n", name, cmd.Desc)
 		}
+		fmt.Println()
+		fmt.Println(`Use "vault help <command>" for more information about a command.`)
+		fmt.Println()
 		return
 	}
 
@@ -289,7 +298,18 @@ func handleHelp(command ...string) {
 		return
 	}
 
-	fmt.Printf("Command: %s\n", cmdName)
-	fmt.Printf("Description: %s\n", cmd.Desc)
-	fmt.Printf("Usage: %s\n", cmd.Usage)
+	fmt.Println()
+	fmt.Println(cmd.Desc)
+	fmt.Println()
+	fmt.Println("Usage:")
+	fmt.Printf("  %s\n", cmd.Usage)
+	fmt.Println()
+
+	if len(cmd.Examples) > 0 {
+		fmt.Println("Examples:")
+		for _, example := range cmd.Examples {
+			fmt.Printf("  %s\n", example)
+		}
+		fmt.Println()
+	}
 }
