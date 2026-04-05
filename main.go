@@ -234,7 +234,7 @@ func handleList(data map[string]interface{}, full bool, group string) {
 		}
 
 		if groupMap, ok := value.(map[string]interface{}); ok {
-			fmt.Printf("%s %s/\n", prefix, key)
+			fmt.Printf("%s%s/\n", prefix, key)
 			if full {
 				var subKeys []string
 				for subKey := range groupMap {
@@ -261,7 +261,7 @@ func handleList(data map[string]interface{}, full bool, group string) {
 				}
 			}
 		} else {
-			fmt.Printf("%s %s\n", prefix, key)
+			fmt.Printf("%s%s\n", prefix, key)
 		}
 	}
 }
