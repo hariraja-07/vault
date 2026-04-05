@@ -72,3 +72,11 @@ func HasKey(data map[string]interface{}, key string) bool {
 	_, exists := data[key]
 	return exists
 }
+
+func HasGroup(data map[string]interface{}, key string) bool {
+	if val, exists := data[key]; exists {
+		_, isGroup := val.(map[string]interface{})
+		return isGroup
+	}
+	return false
+}
