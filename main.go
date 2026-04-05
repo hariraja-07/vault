@@ -29,7 +29,12 @@ func main() {
 		handleRemove(args, data)
 
 	case "list":
-		handleList(data)
+		full := false
+
+		if len(args) > 2 && args[2] == "--full" {
+			full = true
+		}
+		handleList(data, full)
 
 	case "help":
 		if len(args) > 2 {
@@ -165,7 +170,7 @@ func handleRemove(args []string, data map[string]interface{}) {
 	fmt.Println("Deleted :", key)
 }
 
-func handleList(data map[string]interface{}) {
+func handleList(data map[string]interface{}, full bool) {
 	if len(data) == 0 {
 		fmt.Println("No data stored")
 		return
@@ -188,8 +193,33 @@ func handleList(data map[string]interface{}) {
 			prefix = "└── "
 		}
 
-		if _, ok := value.(map[string]interface{}); ok {
+		if groupMap, ok := value.(map[string]interface{}); ok {
 			fmt.Printf("%s %s/\n", prefix, key)
+			if full {
+				var subKeys []string
+				for subKey := range groupMap {
+					subKeys = append(subKeys, subKey)
+				}
+				sort.Strings(subKeys)
+
+				for j, subKey := range subKeys {
+					isSubLast := j == len(subKeys)-1
+
+					if isLast {
+						if isSubLast {
+							fmt.Printf("    └── %s\n", subKey)
+						} else {
+							fmt.Printf("    ├── %s\n", subKey)
+						}
+					} else {
+						if isSubLast {
+							fmt.Printf("│   └── %s\n", subKey)
+						} else {
+							fmt.Printf("│   ├── %s\n", subKey)
+						}
+					}
+				}
+			}
 		} else {
 			fmt.Printf("%s %s\n", prefix, key)
 		}
