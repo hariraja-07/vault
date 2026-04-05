@@ -1,5 +1,9 @@
 #binary 
+vault-linux
 vault 
+vault-macos-intel
+vault-macos-arm
+vault-windows.exe
 
 #data file 
 data.json 
