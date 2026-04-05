@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 const vaultFolderName = ".vault"
 const vaultFileName = "data.json"
 
-func getVaultFilePath() string {
+func GetVaultFilePath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("Cannot find home directory:", err)
@@ -26,8 +26,8 @@ func getVaultFilePath() string {
 	return filepath.Join(vaultDir, vaultFileName)
 }
 
-func loadData() map[string]interface{} {
-	filePath := getVaultFilePath()
+func LoadData() map[string]interface{} {
+	filePath := GetVaultFilePath()
 	data := make(map[string]interface{})
 
 	file, err := os.ReadFile(filePath)
@@ -51,8 +51,8 @@ func loadData() map[string]interface{} {
 	return data
 }
 
-func saveData(data map[string]interface{}) {
-	filePath := getVaultFilePath()
+func SaveData(data map[string]interface{}) {
+	filePath := GetVaultFilePath()
 
 	file, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {

@@ -1,4 +1,4 @@
-package main
+package models
 
 type Command struct {
 	Usage    string
@@ -6,7 +6,7 @@ type Command struct {
 	Examples []string
 }
 
-var commands = map[string]Command{
+var Commands = map[string]Command{
 	"set": {
 		Usage: "vault set <key> <value>",
 		Desc:  "Set a key-value pair",

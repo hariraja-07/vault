@@ -22,12 +22,12 @@
 
 **Linux / Mac:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hariraja-07/vault/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hariraja-07/vault/main/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/hariraja-07/vault/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/hariraja-07/vault/main/scripts/install.ps1 | iex
 ```
 
 ---
@@ -63,7 +63,7 @@ Requires Go 1.25 or later.
 ```bash
 git clone https://github.com/hariraja-07/vault.git
 cd vault
-go build -o vault
+make build
 sudo mv vault /usr/local/bin/
 ```
 
@@ -100,7 +100,7 @@ vault list --full    # Show nested keys
 |---------|-------------|
 | `vault set <key> <value>` | Set a key-value pair |
 | `vault get <key>` | Get a secret |
-| `vault remove <key>` | Delete a secret |
+| `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault help` | Show help |
 
