@@ -1,19 +1,30 @@
 package models
 
+type Flag struct {
+	Name        string
+	Short       string
+	Description string
+}
+
 type Command struct {
 	Usage    string
 	Desc     string
 	Examples []string
+	Flags    []Flag
 }
 
 var Commands = map[string]Command{
 	"set": {
-		Usage: "vault set <key> <value>",
+		Usage: "vault set <key> <value> [--force]",
 		Desc:  "Set a key-value pair",
 		Examples: []string{
 			"vault set api_key sk_live_xxxxx",
 			"vault set work/db_password secret123",
 			"vault set aws/secret_key abc123",
+			"vault set db value --force   # overwrite existing",
+		},
+		Flags: []Flag{
+			{Name: "force", Short: "f", Description: "Force overwrite existing key or group"},
 		},
 	},
 	"get": {
