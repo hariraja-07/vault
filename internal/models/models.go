@@ -20,11 +20,12 @@ var Commands = map[string]Command{
 		Examples: []string{
 			"vault set api_key sk_live_xxxxx",
 			"vault set work/db_password secret123",
-			"vault set aws/secret_key abc123",
-			"vault set db value --force   # overwrite existing",
+			"vault set db/pass1 value        # create group with subkey",
+			"vault set db/pass1 newvalue     # error if exists",
+			"vault set db/pass1 newvalue --force  # overwrite subkey",
 		},
 		Flags: []Flag{
-			{Name: "force", Short: "f", Description: "Force overwrite existing key or group"},
+			{Name: "force", Short: "f", Description: "Force overwrite existing key or subkey"},
 		},
 	},
 	"get": {
