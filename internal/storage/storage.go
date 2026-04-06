@@ -80,3 +80,8 @@ func HasGroup(data map[string]interface{}, key string) bool {
 	}
 	return false
 }
+
+func IsGroup(value interface{}) bool {
+	_, isGroup := value.(map[string]interface{})
+	return isGroup
+}
