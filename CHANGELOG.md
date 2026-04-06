@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.1.3] - 2026-04-06
+### Changes
+- `-F` short form for `--force` flag
+- `-f` short form for `--full` flag
+
 ## [v0.1.2] - 2026-04-06
 ### Added
 - Require `--force` flag to update existing subkeys in `vault set` command

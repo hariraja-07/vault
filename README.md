@@ -108,7 +108,8 @@ vault list --full    # Show nested keys
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--force` | `-f` | Force overwrite existing key, group, or subkey |
+| `--force` | `-F` | Force overwrite existing key, group, or subkey |
+| `--full` | `-f` | Show nested keys within groups |
 
 ---
 
