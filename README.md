@@ -98,11 +98,17 @@ vault list --full    # Show nested keys
 
 | Command | Description |
 |---------|-------------|
-| `vault set <key> <value>` | Set a key-value pair |
+| `vault set <key> <value> [--force]` | Set a key-value pair |
 | `vault get <key>` | Get a secret |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault help` | Show help |
+
+### Flags
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--force` | `-f` | Force overwrite existing key, group, or subkey |
 
 ---
 
