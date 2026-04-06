@@ -43,13 +43,25 @@ func HandleHelp(command ...string) {
 	fmt.Println()
 	fmt.Println("Usage:")
 	fmt.Printf("  %s\n", cmd.Usage)
-	fmt.Println()
+
+	if len(cmd.Flags) > 0 {
+		fmt.Println()
+		fmt.Println("Flags:")
+		for _, flag := range cmd.Flags {
+			shortForm := ""
+			if flag.Short != "" {
+				shortForm = fmt.Sprintf(" (-%s)", flag.Short)
+			}
+			fmt.Printf("  --%s%s    %s\n", flag.Name, shortForm, flag.Description)
+		}
+	}
 
 	if len(cmd.Examples) > 0 {
+		fmt.Println()
 		fmt.Println("Examples:")
 		for _, example := range cmd.Examples {
 			fmt.Printf("  %s\n", example)
 		}
-		fmt.Println()
 	}
+	fmt.Println()
 }
