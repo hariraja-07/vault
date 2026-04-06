@@ -20,7 +20,7 @@ func HandleSet(args []string) {
 			}
 		} else if strings.HasPrefix(arg, "-") {
 			flag := strings.TrimPrefix(arg, "-")
-			if flag == "f" {
+			if flag == "F" {
 				force = true
 			}
 		} else if key == "" {
@@ -46,7 +46,7 @@ func HandleSet(args []string) {
 			if !storage.IsGroup(existingGroup) {
 				if !force {
 					fmt.Printf("Error: Key '%s' already exists.\n", group)
-					fmt.Println("Use --force or -f to overwrite.")
+					fmt.Println("Use --force or -F to overwrite.")
 					return
 				}
 				delete(data, group)
@@ -56,7 +56,7 @@ func HandleSet(args []string) {
 				if _, subKeyExists := groupMap[subKey]; subKeyExists {
 					if !force {
 						fmt.Printf("Error: Subkey '%s' already exists in group '%s'.\n", subKey, group)
-						fmt.Println("Use --force or -f to overwrite.")
+						fmt.Println("Use --force or -F to overwrite.")
 						return
 					}
 					fmt.Printf("Warning: overwriting subkey '%s'\n", subKey)
@@ -78,11 +78,11 @@ func HandleSet(args []string) {
 					count := len(groupMap)
 
 					fmt.Printf("Error: Group '%s' already exists with %d nested key(s).\n", key, count)
-					fmt.Println("Use --force to delete all nested keys and overwrite.")
+					fmt.Println("Use --force or -F to delete all nested keys and overwrite.")
 					return
 				}
 				fmt.Printf("Error: Key '%s' already exists.\n", key)
-				fmt.Println("Use --force or -f to overwrite.")
+				fmt.Println("Use --force or -F to overwrite.")
 				return
 			}
 
@@ -91,7 +91,7 @@ func HandleSet(args []string) {
 				count := len(groupMap)
 
 				fmt.Printf("Error: Group '%s' already exists with %d nested key(s).\n", key, count)
-				fmt.Println("Use --force or -f to delete all nested keys and overwrite.")
+				fmt.Println("Use --force or -F to delete all nested keys and overwrite.")
 				return
 			}
 

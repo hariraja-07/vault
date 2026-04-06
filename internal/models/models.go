@@ -25,7 +25,7 @@ var Commands = map[string]Command{
 			"vault set db/pass1 newvalue --force  # overwrite subkey",
 		},
 		Flags: []Flag{
-			{Name: "force", Short: "f", Description: "Force overwrite existing key or subkey"},
+			{Name: "force", Short: "F", Description: "Force overwrite existing key or subkey"},
 		},
 	},
 	"get": {
@@ -51,7 +51,11 @@ var Commands = map[string]Command{
 		Examples: []string{
 			"vault list",
 			"vault list --full        # show keys within groups",
+			"vault list -f            # short form for --full",
 			"vault list work          # show keys in 'work' group only",
+		},
+		Flags: []Flag{
+			{Name: "full", Short: "f", Description: "Show nested keys within groups"},
 		},
 	},
 	"help": {

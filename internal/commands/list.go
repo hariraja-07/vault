@@ -12,7 +12,7 @@ func HandleList(args []string) {
 	group := ""
 
 	for _, arg := range args[2:] {
-		if arg == "--full" {
+		if arg == "--full" || arg == "-f" {
 			full = true
 		} else {
 			group = arg
