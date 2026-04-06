@@ -8,15 +8,31 @@ import (
 )
 
 func HandleSet(args []string) {
-	if len(args) < 4 {
+	force := false
+	key := ""
+	value := ""
+
+	for _, arg := range args[2:] {
+		if strings.HasPrefix(arg, "--") {
+			flag := strings.TrimPrefix(arg, "--")
+			if flag == "force" || flag == "f" {
+				force = true
+			}
+		} else if key == "" {
+			key = arg
+		} else if value == "" {
+			value = arg
+		}
+	}
+
+	_ = force
+
+	if key == "" || value == "" {
 		HandleHelp("set")
 		return
 	}
 
 	data := storage.LoadData()
-
-	key := args[2]
-	value := args[3]
 
 	if strings.Contains(key, "/") {
 		parts := strings.SplitN(key, "/", 2)
@@ -36,3 +52,5 @@ func HandleSet(args []string) {
 	storage.SaveData(data)
 	fmt.Println("Saved:", key)
 }
+
+func init() {}
