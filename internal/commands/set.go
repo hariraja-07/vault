@@ -46,6 +46,16 @@ func HandleSet(args []string) {
 				}
 				delete(data, group)
 				fmt.Printf("Warning: overwriting key '%s'\n", group)
+			} else {
+				groupMap := existingGroup.(map[string]interface{})
+				if _, subKeyExists := groupMap[subKey]; subKeyExists {
+					if !force {
+						fmt.Printf("Error: Subkey '%s' already exists in group '%s'.\n", subKey, group)
+						fmt.Println("Use --force to overwrite.")
+						return
+					}
+					fmt.Printf("Warning: overwriting subkey '%s'\n", subKey)
+				}
 			}
 		}
 
