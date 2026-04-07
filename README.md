@@ -13,6 +13,7 @@
 - **Grouped Organization** — Organize secrets by project (`work/api_key`)
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
+- **Shell Completion** — Auto-complete commands and keys in Bash, Zsh, Fish, PowerShell, CMD
 
 ---
 
@@ -20,7 +21,9 @@
 
 ### Quick Install (One-Line)
 
-**Linux / Mac:**
+Shell completion is installed automatically with the install script.
+
+**Linux / macOS:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/hariraja-07/vault/main/scripts/install.sh | bash
 ```
@@ -46,12 +49,34 @@ Download the binary for your platform:
 After download:
 
 ```bash
-# Linux / Mac
+# Linux / macOS
 chmod +x vault-linux
 mv vault-linux /usr/local/bin/vault
 
 # Windows
 # Rename to vault.exe and add to PATH
+```
+
+---
+
+### Manual Shell Completion
+
+If you download binaries manually, install shell completion:
+
+```bash
+# Bash
+vault completion bash > ~/.bash_completion.d/vault
+
+# Zsh
+vault completion zsh > ~/.zfunc/_vault
+
+# Fish
+vault completion fish > ~/.config/fish/completions/vault.fish
+```
+
+PowerShell: Add to your profile:
+```powershell
+Invoke-Expression $(vault completion powershell)
 ```
 
 ---
@@ -98,11 +123,12 @@ vault list --full    # Show nested keys
 
 | Command | Description |
 |---------|-------------|
-| `vault set <key> <value> [--force]` | Set a key-value pair |
+| `vault set <key> <value>` | Set a key-value pair |
 | `vault get <key>` | Get a secret |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault help` | Show help |
+| `vault completion <shell>` | Generate shell completion script |
 
 ### Flags
 
