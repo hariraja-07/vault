@@ -29,4 +29,23 @@ if ($UserPath -notlike "*$InstallDir*") {
 }
 
 Write-Output "Installed to $InstallDir\vault.exe"
+
+# Install PowerShell completion
+Write-Output ""
+Write-Output "Installing PowerShell completion..."
+
+$ProfilePath = $PROFILE
+if (-not (Test-Path $ProfilePath)) {
+    New-Item -Path $ProfilePath -ItemType File -Force | Out-Null
+}
+
+$CompletionLine = "Invoke-Expression -Command `$(vault completion powershell)"
+if (-not (Select-String -Path $ProfilePath -Pattern "vault completion" -Quiet)) {
+    Add-Content -Path $ProfilePath -Value ""
+    Add-Content -Path $ProfilePath -Value "# vault completion"
+    Add-Content -Path $ProfilePath -Value $CompletionLine
+    Write-Output "PowerShell completion added to your profile"
+}
+
+Write-Output ""
 Write-Output "Done! Run 'vault help' to get started."
