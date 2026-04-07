@@ -155,7 +155,9 @@ complete -c vault -n '__fish_use_subcommand' -a 'help' -d 'Show help'
 complete -c vault -n '__fish_use_subcommand' -a 'completion' -d 'Generate completion script'
 
 # Key completions for set, get, remove
-complete -c vault -n '__fish_seen_subcommand_from set; or __fish_seen_subcommand_from get; or __fish_seen_subcommand_from remove' -a '(__vault_keys)'
+complete -c vault -n '__fish_seen_subcommand_from set' -a '(__vault_keys)'
+complete -c vault -n '__fish_seen_subcommand_from get' -a '(__vault_keys)'
+complete -c vault -n '__fish_seen_subcommand_from remove' -a '(__vault_keys)'
 
 # Group completions for list
 complete -c vault -n '__fish_seen_subcommand_from list' -a '(__vault_groups)'
@@ -214,14 +216,18 @@ Register-ArgumentCompleter -CommandName vault -ScriptBlock $vaultCompleter
 
 func generateCmdCompletion() {
 	completion := `@echo off
-rem vault CMD completion
-doskey /completion:on
-doskey /exename=vault
+rem vault CMD completion - basic command completion
+rem Note: CMD has limited completion support. For best experience, use PowerShell.
 
-:vault_complete
-if "%1"=="" goto :done
-echo set get remove list help completion
-:done
+doskey vault= vault $*
+
+:completion
+echo set
+echo get
+echo remove
+echo list
+echo help
+echo completion
 `
 	fmt.Print(completion)
 }
