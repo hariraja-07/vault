@@ -47,5 +47,48 @@ if (-not (Select-String -Path $ProfilePath -Pattern "vault completion" -Quiet)) 
     Write-Output "PowerShell completion added to your profile"
 }
 
+# Install CMD completion
+Write-Output ""
+Write-Output "Installing CMD completion..."
+
+$CmdFile = "$env:USERPROFILE\vault_complete.bat"
+$CmdContent = @"
+@echo off
+rem vault CMD completion
+doskey /exename=vault.exe
+
+if "%%1"=="set" goto :set
+if "%%1"=="get" goto :get
+if "%%1"=="remove" goto :remove
+if "%%1"=="list" goto :list
+if "%%1"=="help" goto :help
+if "%%1"=="completion" goto :completion
+goto :end
+
+:set
+:get
+:remove
+:list
+:help
+:completion
+echo set get remove list help completion --force -F --full -f
+
+:end
+"@
+
+Set-Content -Path $CmdFile -Value $CmdContent -Force
+Write-Output "CMD completion installed to $CmdFile"
+Write-Output "To enable, run: $CmdFile"
+
+# Add to CMD autorun
+$AutorunPath = "HKCU:\Software\Microsoft\Command Processor"
+$AutorunValue = Get-ItemProperty -Path $AutorunPath -Name AutoRun -ErrorAction SilentlyContinue
+if (-not $AutorunValue) {
+    Set-ItemProperty -Path $AutorunPath -Name AutoRun -Value "CALL `"$CmdFile`""
+    Write-Output "CMD completion enabled for all CMD sessions"
+} else {
+    Write-Output "CMD autorun already set. Completion file installed to $CmdFile"
+}
+
 Write-Output ""
 Write-Output "Done! Run 'vault help' to get started."
