@@ -79,6 +79,12 @@ PowerShell: Add to your profile:
 Invoke-Expression $(vault completion powershell)
 ```
 
+CMD: Run in CMD:
+```cmd
+vault completion cmd > %USERPROFILE%\vault_complete.bat
+%USERPROFILE%\vault_complete.bat
+```
+
 ---
 
 ### Build from Source
