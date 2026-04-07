@@ -66,4 +66,15 @@ var Commands = map[string]Command{
 			"vault help set",
 		},
 	},
+	"completion": {
+		Usage: "vault completion <shell>",
+		Desc:  "Generate shell completion script",
+		Examples: []string{
+			"vault completion bash",
+			"vault completion zsh",
+			"vault completion fish",
+			"vault completion powershell",
+			"vault completion cmd",
+		},
+	},
 }

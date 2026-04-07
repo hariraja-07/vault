@@ -1,9 +1,9 @@
 # binaries
-vault
-vault-linux
-vault-macos-intel
-vault-macos-arm
-vault-windows.exe
+/vault
+/vault-linux
+/vault-macos-intel
+/vault-macos-arm
+/vault-windows.exe
 
 # data file
 data.json
