@@ -52,13 +52,40 @@ fi
 echo ""
 echo "Installing shell completion..."
 
+install_bash_completion() {
+    if command -v apt-get &>/dev/null; then
+        if ! dpkg -l bash-completion &>/dev/null 2>&1; then
+            echo "Installing bash-completion package..."
+            sudo apt-get update -qq && sudo apt-get install -y bash-completion 2>/dev/null && return 0
+        fi
+    elif command -v dnf &>/dev/null; then
+        if ! rpm -q bash-completion &>/dev/null 2>&1; then
+            echo "Installing bash-completion package..."
+            sudo dnf install -y bash-completion 2>/dev/null && return 0
+        fi
+    elif command -v brew &>/dev/null; then
+        if ! brew list bash-completion@2 &>/dev/null 2>&1; then
+            echo "Installing bash-completion package..."
+            brew install bash-completion@2 2>/dev/null && return 0
+        fi
+    fi
+    return 1
+}
+
 case "$SHELL" in
     */bash)
-        if [ -d /etc/bash_completion.d ]; then
+        if ! install_bash_completion; then
+            echo "Could not auto-install bash-completion (may need sudo or package manager)"
+            echo "Using standalone completion script..."
+        else
+            echo "Bash completion package installed"
+        fi
+
+        if [ -d /etc/bash_completion.d ] && [ -w /etc/bash_completion.d ]; then
             vault completion bash > /etc/bash_completion.d/vault 2>/dev/null && echo "Bash completion installed"
-        elif [ -w ~/.bash_completion ]; then
-            vault completion bash >> ~/.bash_completion && echo "Bash completion installed"
-        elif [ -f ~/.bashrc ]; then
+        elif [ -w ~/.bash_completion.d ] 2>/dev/null || mkdir -p ~/.bash_completion.d 2>/dev/null; then
+            vault completion bash > ~/.bash_completion.d/vault && echo "Bash completion installed"
+        else
             echo 'source <(vault completion bash)' >> ~/.bashrc && echo "Bash completion added to ~/.bashrc"
         fi
         ;;

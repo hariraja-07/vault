@@ -61,7 +61,20 @@ mv vault-linux /usr/local/bin/vault
 
 ### Manual Shell Completion
 
-If you download binaries manually, install shell completion:
+For best bash completion experience, install the `bash-completion` package:
+
+```bash
+# Ubuntu/Debian
+sudo apt install bash-completion
+
+# Fedora/RHEL
+sudo dnf install bash-completion
+
+# macOS
+brew install bash-completion@2
+```
+
+Then install completion:
 
 ```bash
 # Bash
@@ -79,11 +92,7 @@ PowerShell: Add to your profile:
 Invoke-Expression $(vault completion powershell)
 ```
 
-CMD: Run in CMD:
-```cmd
-vault completion cmd > %USERPROFILE%\vault_complete.bat
-%USERPROFILE%\vault_complete.bat
-```
+For CMD, use PowerShell instead for better experience.
 
 ---
 

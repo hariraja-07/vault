@@ -48,17 +48,20 @@ func HandleCompletion(args []string) {
 func generateBashCompletion() {
 	completion := `#!/bin/bash
 
-# vault Bash Completion
-# Install: vault completion bash > /etc/bash_completion.d/vault
+# vault Bash Completion (standalone - no dependencies)
+# Install: vault completion bash > ~/.bash_completion.d/vault
 # Or: source <(vault completion bash)
 
 _vault() {
-    local cur prev words cword
-    _init_completion -n=: || return
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    local commands="set get remove list help completion"
+    if [ $COMP_CWORD -eq 1 ]; then
+        COMPREPLY=($(compgen -W "set get remove list help completion" -- "$cur"))
+        return
+    fi
 
-    case "${words[1]}" in
+    case "${COMP_WORDS[1]}" in
         set|get|remove)
             local keys
             keys=$(vault list 2>/dev/null | grep -E '^[├─ └─]' | tr -d '├─ └─ ' | grep -v '/' | grep -v '^Vault$')
@@ -67,21 +70,12 @@ _vault() {
         list)
             local groups
             groups=$(vault list 2>/dev/null | grep '/' | tr -d '├─ └─ /')
-            COMPREPLY=($(compgen -W "$groups" -- "$cur"))
-            COMPREPLY+=('--full' '-f')
+            COMPREPLY=($(compgen -W "$groups --full -f" -- "$cur"))
             ;;
-        help)
-            COMPREPLY=($(compgen -W "set get remove list help completion" -- "$cur"))
-            ;;
-        completion)
-            COMPREPLY=($(compgen -W "bash zsh fish powershell cmd" -- "$cur"))
-            ;;
-        *)
-            COMPREPLY=($(compgen -W "$commands" -- "$cur"))
+        help|completion)
+            COMPREPLY=($(compgen -W "set get remove list help completion bash zsh fish powershell cmd" -- "$cur"))
             ;;
     esac
-
-    return 0
 }
 
 complete -F _vault vault
