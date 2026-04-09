@@ -14,6 +14,7 @@
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
 - **Shell Completion** — Auto-complete commands and keys in Bash, Zsh, Fish, PowerShell, CMD
+- **Nested Key Completion** — `vault get group/<TAB>` shows inner keys
 - **Recent Keys Tracking** — Smart suggestions based on recently used keys
 - **Configurable Settings** — Customize completion behavior
 
@@ -100,11 +101,14 @@ sudo mv vault /usr/local/bin/
 ### Set a secret
 ```bash
 vault set api_key sk_live_xxxxx
+vault set work/db_pass secret123   # grouped keys
 ```
 
 ### Get a secret
 ```bash
 vault get api_key
+vault get work/              # list keys in group
+vault get work/db_pass       # get specific key in group
 ```
 
 ### Delete a secret
