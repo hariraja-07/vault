@@ -12,6 +12,7 @@
 - **Key-Value Storage** — Store and retrieve secrets
 - **Grouped Organization** — Organize secrets by project (`work/api_key`)
 - **Per-Key Encryption** — Encrypt sensitive values with `--secure` flag using AES-256-GCM
+- **Clipboard Support** — Paste from and copy to clipboard with `-p` and `-c` flags
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
 - **Shell Completion** — Auto-complete commands and keys in Bash, Zsh, Fish, PowerShell, CMD
@@ -103,10 +104,17 @@ sudo mv vault /usr/local/bin/
 ```bash
 vault set api_key sk_live_xxxxx
 vault set work/db_pass secret123   # grouped keys
-vault set api_key sk_live_xxxxx --secure   # encrypt the value
+vault set api_key --paste          # paste from clipboard
+vault set api_key --paste --secure   # paste and encrypt
 ```
 
 ### Get a secret
+```bash
+vault get api_key
+vault get api_key -c             # copy to clipboard
+vault get work/              # list keys in group
+vault get work/db_pass       # get specific key in group
+```
 ```bash
 vault get api_key
 vault get work/              # list keys in group
@@ -131,8 +139,10 @@ vault list --full    # Show nested keys
 | Command | Description |
 |---------|-------------|
 | `vault set <key> <value>` | Set a key-value pair |
-| `vault set <key> <value> --secure` | Set an encrypted key-value pair |
-| `vault get <key>` | Get a secret (prompts for password if encrypted) |
+| `vault set <key> --paste` | Set value from clipboard |
+| `vault set <key> --paste --secure` | Paste from clipboard and encrypt |
+| `vault get <key>` | Get a secret |
+| `vault get <key> --copy` | Get a secret and copy to clipboard |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault list --recent [n]` | List recent keys (default: 10) |
@@ -145,6 +155,8 @@ vault list --full    # Show nested keys
 
 | Flag | Short | Description |
 |------|-------|-------------|
+| `--paste` | `-p` | Read value from clipboard |
+| `--copy` | `-c` | Copy value to clipboard |
 | `--secure` | `-s` | Encrypt the value using AES-256-GCM |
 | `--force` | `-F` | Force overwrite existing key, group, or subkey |
 | `--full` | `-f` | Show nested keys within groups |
