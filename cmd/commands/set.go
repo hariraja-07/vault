@@ -217,7 +217,7 @@ func storeEncryptedValue(data map[string]interface{}, key string, force bool, en
 
 func init() {
 	SetCmd.Flags().BoolVarP(&setForce, "force", "F", false, "Force overwrite existing key")
-	SetCmd.Flags().BoolVarP(&setSecure, "secure", "s", false, "Encrypt this value with a password")
+	SetCmd.Flags().BoolVarP(&setSecure, "secure", "S", false, "Encrypt this value with a password")
 	SetCmd.Flags().BoolVarP(&setPaste, "paste", "p", false, "Read value from clipboard")
 	RegisterKeyCompletion(SetCmd)
 }
