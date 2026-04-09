@@ -95,3 +95,19 @@ func IsGroup(value interface{}) bool {
 	_, isGroup := value.(map[string]interface{})
 	return isGroup
 }
+
+// EncryptedData represents encrypted data stored in JSON
+type EncryptedData struct {
+	Ciphertext string `json:"ciphertext"`
+	Nonce      string `json:"nonce"`
+}
+
+// IsEncrypted checks if a value is encrypted (has ciphertext and nonce)
+func IsEncrypted(value interface{}) bool {
+	if m, ok := value.(map[string]interface{}); ok {
+		_, hasCiphertext := m["ciphertext"]
+		_, hasNonce := m["nonce"]
+		return hasCiphertext && hasNonce
+	}
+	return false
+}
