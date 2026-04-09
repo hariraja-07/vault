@@ -1,13 +1,21 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
+	"github.com/gopasspw/clipboard"
 	"github.com/spf13/cobra"
 	"vault/internal/crypto"
 	"vault/internal/storage"
 )
+
+var copyFlag bool
+
+func init() {
+	GetCmd.Flags().BoolVarP(&copyFlag, "copy", "c", false, "Copy the secret to clipboard")
+}
 
 var GetCmd = &cobra.Command{
 	Use:   "get <key>",
@@ -51,7 +59,8 @@ var GetCmd = &cobra.Command{
 			}
 		}
 
-		// Check if value is encrypted
+		var result string
+
 		if encryptedVal, ok := val.(map[string]interface{}); ok {
 			password := askPassword("Enter password: ")
 			ev := &crypto.EncryptedValue{
@@ -63,9 +72,22 @@ var GetCmd = &cobra.Command{
 				fmt.Println("Error: Decryption failed. Wrong password?")
 				return
 			}
-			fmt.Println(decrypted)
+			result = decrypted
 		} else {
-			fmt.Println(val)
+			result = fmt.Sprintf("%v", val)
+		}
+
+		truncated := result
+		if len(truncated) > 8 {
+			truncated = truncated[:8] + "..."
+		}
+
+		fmt.Printf("Retrieved content: %s\n", truncated)
+		fmt.Println(result)
+
+		if copyFlag {
+			clipboard.WriteAllString(context.Background(), result)
+			fmt.Printf("Copied: %s\n", key)
 		}
 
 		storage.TrackKeyUsage(key)
