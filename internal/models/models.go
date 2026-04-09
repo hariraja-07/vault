@@ -46,16 +46,26 @@ var Commands = map[string]Command{
 		},
 	},
 	"list": {
-		Usage: "vault list [group] [--full]",
+		Usage: "vault list [group] [--full] [--recent]",
 		Desc:  "List all secrets or secrets in a specific group",
 		Examples: []string{
 			"vault list",
 			"vault list --full        # show keys within groups",
 			"vault list -f            # short form for --full",
 			"vault list work          # show keys in 'work' group only",
+			"vault list --recent      # show recent keys",
+			"vault list --recent 5    # show 5 recent keys",
 		},
 		Flags: []Flag{
 			{Name: "full", Short: "f", Description: "Show nested keys within groups"},
+		},
+	},
+	"config": {
+		Usage: "vault config get/set <key> [value]",
+		Desc:  "Manage vault configuration",
+		Examples: []string{
+			"vault config get recent-limit",
+			"vault config set recent-limit 10",
 		},
 	},
 	"help": {

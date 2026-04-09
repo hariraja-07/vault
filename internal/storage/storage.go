@@ -10,6 +10,15 @@ import (
 const vaultFolderName = ".vault"
 const vaultFileName = "data.json"
 
+var initialized = false
+
+func ensureInitialized() {
+	if !initialized {
+		InitConfig()
+		initialized = true
+	}
+}
+
 func GetVaultFilePath() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -27,6 +36,7 @@ func GetVaultFilePath() string {
 }
 
 func LoadData() map[string]interface{} {
+	ensureInitialized()
 	filePath := GetVaultFilePath()
 	data := make(map[string]interface{})
 

@@ -14,6 +14,8 @@
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
 - **Shell Completion** — Auto-complete commands and keys in Bash, Zsh, Fish, PowerShell, CMD
+- **Recent Keys Tracking** — Smart suggestions based on recently used keys
+- **Configurable Settings** — Customize completion behavior
 
 ---
 
@@ -59,40 +61,24 @@ mv vault-linux /usr/local/bin/vault
 
 ---
 
-### Manual Shell Completion
+### Shell Completion
 
-For best bash completion experience, install the `bash-completion` package:
-
-```bash
-# Ubuntu/Debian
-sudo apt install bash-completion
-
-# Fedora/RHEL
-sudo dnf install bash-completion
-
-# macOS
-brew install bash-completion@2
-```
-
-Then install completion:
+Install shell completion for your shell:
 
 ```bash
-# Bash
-vault completion bash > ~/.bash_completion.d/vault
-
-# Zsh
-vault completion zsh > ~/.zfunc/_vault
-
-# Fish
-vault completion fish > ~/.config/fish/completions/vault.fish
+vault completion
 ```
 
-PowerShell: Add to your profile:
-```powershell
-Invoke-Expression $(vault completion powershell)
-```
+This auto-detects your shell (Bash, Zsh, or Fish) and installs completion. Restart your terminal to use it.
 
-For CMD, use PowerShell instead for better experience.
+For manual installation:
+```bash
+vault completion bash      # Bash
+vault completion zsh       # Zsh
+vault completion fish      # Fish
+vault completion powershell # PowerShell
+vault completion cmd       # CMD
+```
 
 ---
 
@@ -142,6 +128,9 @@ vault list --full    # Show nested keys
 | `vault get <key>` | Get a secret |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
+| `vault list --recent [n]` | List recent keys (default: 10) |
+| `vault config get <key>` | Get a config value |
+| `vault config set <key> <value>` | Set a config value |
 | `vault help` | Show help |
 | `vault completion <shell>` | Generate shell completion script |
 
@@ -151,6 +140,21 @@ vault list --full    # Show nested keys
 |------|-------|-------------|
 | `--force` | `-F` | Force overwrite existing key, group, or subkey |
 | `--full` | `-f` | Show nested keys within groups |
+| `--recent` | - | Show recent keys (use with `list`) |
+
+### Configuration
+
+| Config Key | Description | Default |
+|-----------|-------------|---------|
+| `recent-limit` | Number of recent keys to show in completion | 10 |
+
+**Examples:**
+```bash
+vault config get recent-limit
+vault config set recent-limit 20
+vault list --recent
+vault list --recent 5
+```
 
 ---
 

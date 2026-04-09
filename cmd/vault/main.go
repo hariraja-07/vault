@@ -31,6 +31,8 @@ func main() {
 		}
 	case "completion":
 		commands.HandleCompletion(args)
+	case "config":
+		commands.HandleConfig(args)
 	default:
 		commands.HandleHelp()
 	}

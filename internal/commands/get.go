@@ -38,6 +38,7 @@ func HandleGet(args []string) {
 		}
 
 		fmt.Println(val)
+		storage.TrackKeyUsage(key)
 		return
 	}
 
@@ -47,4 +48,5 @@ func HandleGet(args []string) {
 		return
 	}
 	fmt.Println(val)
+	storage.TrackKeyUsage(key)
 }

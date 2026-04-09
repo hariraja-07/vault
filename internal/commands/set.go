@@ -109,6 +109,7 @@ func HandleSet(args []string) {
 	}
 
 	storage.SaveData(data)
+	storage.TrackKeyUsage(key)
 	fmt.Println("Saved:", key)
 }
 

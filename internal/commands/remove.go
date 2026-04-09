@@ -43,6 +43,7 @@ func HandleRemove(args []string) {
 		}
 
 		storage.SaveData(data)
+		storage.TrackKeyUsage(key)
 		fmt.Println("Deleted:", key)
 		return
 	}
@@ -53,6 +54,7 @@ func HandleRemove(args []string) {
 	}
 	delete(data, key)
 	storage.SaveData(data)
+	storage.TrackKeyUsage(key)
 
 	fmt.Println("Deleted:", key)
 }
