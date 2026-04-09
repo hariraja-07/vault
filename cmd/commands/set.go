@@ -1,9 +1,11 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
+	"github.com/gopasspw/clipboard"
 	"github.com/spf13/cobra"
 	"vault/internal/crypto"
 	"vault/internal/storage"
@@ -18,19 +20,50 @@ func askPassword(prompt string) string {
 
 var setForce bool
 var setSecure bool
+var setPaste bool
 
 var SetCmd = &cobra.Command{
-	Use:   "set <key> <value>",
+	Use:   "set <key> [value]",
 	Short: "Set a key-value pair",
-	Args:  cobra.ExactArgs(2),
+	Args:  cobra.RangeArgs(1, 2),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return completeKeys(cmd, args, toComplete)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
-		value := args[1]
 		force := setForce
 		secure := setSecure
+		paste := setPaste
+
+		var value string
+
+		if len(args) > 1 {
+			value = args[1]
+		} else if paste {
+			if clipboard.IsUnsupported() {
+				fmt.Println("Error: Clipboard is not supported on this system")
+				return
+			}
+			clipboardContent, err := clipboard.ReadAllString(context.Background())
+			if err != nil {
+				fmt.Println("Error: Failed to read clipboard")
+				return
+			}
+			if clipboardContent == "" {
+				fmt.Println("Error: Clipboard is empty. Copy content first.")
+				return
+			}
+			value = clipboardContent
+		} else {
+			fmt.Println("Error: Provide a value or use --paste flag")
+			return
+		}
+
+		truncated := value
+		if len(truncated) > 8 {
+			truncated = truncated[:8] + "..."
+		}
+		fmt.Printf("Retrieved content: %s\n", truncated)
 
 		data := storage.LoadData()
 
@@ -66,7 +99,7 @@ var SetCmd = &cobra.Command{
 
 		storage.SaveData(data)
 		storage.TrackKeyUsage(key)
-		fmt.Println("Saved:", key)
+		fmt.Println("Stored:", key)
 	},
 }
 
@@ -185,5 +218,6 @@ func storeEncryptedValue(data map[string]interface{}, key string, force bool, en
 func init() {
 	SetCmd.Flags().BoolVarP(&setForce, "force", "F", false, "Force overwrite existing key")
 	SetCmd.Flags().BoolVarP(&setSecure, "secure", "s", false, "Encrypt this value with a password")
+	SetCmd.Flags().BoolVarP(&setPaste, "paste", "p", false, "Read value from clipboard")
 	RegisterKeyCompletion(SetCmd)
 }
