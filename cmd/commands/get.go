@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"vault/internal/crypto"
 	"vault/internal/storage"
 )
 
@@ -18,6 +19,8 @@ var GetCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		data := storage.LoadData()
 		key := args[0]
+
+		var val interface{}
 
 		if strings.Contains(key, "/") {
 			if strings.Count(key, "/") > 1 {
@@ -34,23 +37,37 @@ var GetCmd = &cobra.Command{
 				fmt.Println("Group not found")
 				return
 			}
-			val, ok := groupMap[subKey]
+			val, ok = groupMap[subKey]
 			if !ok {
 				fmt.Println("Key not found")
 				return
 			}
+		} else {
+			var ok bool
+			val, ok = data[key]
+			if !ok {
+				fmt.Println("Key not found")
+				return
+			}
+		}
 
+		// Check if value is encrypted
+		if encryptedVal, ok := val.(map[string]interface{}); ok {
+			password := askPassword("Enter password: ")
+			ev := &crypto.EncryptedValue{
+				Ciphertext: encryptedVal["ciphertext"].(string),
+				Nonce:      encryptedVal["nonce"].(string),
+			}
+			decrypted, err := crypto.Decrypt(ev, password)
+			if err != nil {
+				fmt.Println("Error: Decryption failed. Wrong password?")
+				return
+			}
+			fmt.Println(decrypted)
+		} else {
 			fmt.Println(val)
-			storage.TrackKeyUsage(key)
-			return
 		}
 
-		val, ok := data[key]
-		if !ok {
-			fmt.Println("Key not found")
-			return
-		}
-		fmt.Println(val)
 		storage.TrackKeyUsage(key)
 	},
 }

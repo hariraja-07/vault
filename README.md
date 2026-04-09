@@ -11,6 +11,7 @@
 
 - **Key-Value Storage** — Store and retrieve secrets
 - **Grouped Organization** — Organize secrets by project (`work/api_key`)
+- **Per-Key Encryption** — Encrypt sensitive values with `--secure` flag using AES-256-GCM
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
 - **Shell Completion** — Auto-complete commands and keys in Bash, Zsh, Fish, PowerShell, CMD
@@ -102,6 +103,7 @@ sudo mv vault /usr/local/bin/
 ```bash
 vault set api_key sk_live_xxxxx
 vault set work/db_pass secret123   # grouped keys
+vault set api_key sk_live_xxxxx --secure   # encrypt the value
 ```
 
 ### Get a secret
@@ -129,7 +131,8 @@ vault list --full    # Show nested keys
 | Command | Description |
 |---------|-------------|
 | `vault set <key> <value>` | Set a key-value pair |
-| `vault get <key>` | Get a secret |
+| `vault set <key> <value> --secure` | Set an encrypted key-value pair |
+| `vault get <key>` | Get a secret (prompts for password if encrypted) |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault list --recent [n]` | List recent keys (default: 10) |
@@ -142,6 +145,7 @@ vault list --full    # Show nested keys
 
 | Flag | Short | Description |
 |------|-------|-------------|
+| `--secure` | `-s` | Encrypt the value using AES-256-GCM |
 | `--force` | `-F` | Force overwrite existing key, group, or subkey |
 | `--full` | `-f` | Show nested keys within groups |
 | `--recent` | - | Show recent keys (use with `list`) |
