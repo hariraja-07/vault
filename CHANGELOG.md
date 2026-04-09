@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.2.1] - 2026-04-10
+
+### Added
+- **Clipboard support** - Read from and copy to clipboard with `-p` and `-c` flags
+- **`--paste` flag** - `vault set key --paste` reads value from clipboard
+- **`--copy` flag** - `vault get key --copy` copies value to clipboard
+- Clipboard paste works with `--secure` for encrypted secrets
+
+### Changes
+- Improved output messages for clipboard operations
+
 ## [v0.2.0] - 2026-04-08
 
 ### Added
