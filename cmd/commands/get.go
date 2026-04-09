@@ -77,12 +77,6 @@ var GetCmd = &cobra.Command{
 			result = fmt.Sprintf("%v", val)
 		}
 
-		truncated := result
-		if len(truncated) > 8 {
-			truncated = truncated[:8] + "..."
-		}
-
-		fmt.Printf("Retrieved content: %s\n", truncated)
 		fmt.Println(result)
 
 		if copyFlag {
