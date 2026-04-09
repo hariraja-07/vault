@@ -86,7 +86,10 @@ var GetCmd = &cobra.Command{
 		fmt.Println(result)
 
 		if copyFlag {
-			clipboard.WriteAllString(context.Background(), result)
+			if err := clipboard.WriteAllString(context.Background(), result); err != nil {
+				fmt.Println("Error: Failed to copy to clipboard")
+				return
+			}
 			fmt.Printf("Copied: %s\n", key)
 		}
 
