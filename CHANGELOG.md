@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.3.0] - 2026-04-10
+
+### Added
+- **Find command** - Fuzzy search across all keys with `vault find`
+- **Case-insensitive search** - Search terms are case-insensitive
+- **Multiple search terms** - Search with multiple terms (OR logic)
+- **Pagination** - Shows 10 results at a time with "more (y/N)" prompt
+- **Interactive selection** - `vault find -s` allows selecting from results
+- **`--select` / `-s`** - Interactive selection mode
+- **`--group` / `-g`** - Search within specific group
+- **`--limit` / `-l`** - Limit number of results
+
+### Changes
+- Changed `--secure` shortcut from `-s` to `-S` to avoid conflict with `--select`
+
+### Examples
+```bash
+vault find api                  # fuzzy search
+vault find api db               # multiple terms
+vault find api -s              # interactive selection
+vault find api -g work         # search in group
+vault find api -l 10           # limit results
+vault find api -s -c           # select and copy
+```
+
 ## [v0.2.1] - 2026-04-10
 
 ### Added
