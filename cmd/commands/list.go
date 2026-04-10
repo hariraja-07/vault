@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/spf13/cobra"
 	"vault/internal/storage"
@@ -59,12 +60,13 @@ func showAll(data map[string]interface{}) {
 			prefix = "└── "
 		}
 
-		if groupMap, ok := value.(map[string]interface{}); ok {
+		if isGroup(value) {
 			fmt.Printf("%s%s/\n", prefix, key)
 			if listFull {
+				groupMap := value.(map[string]interface{})
 				var subKeys []string
 				for subKey, subValue := range groupMap {
-					if !storage.IsExpired(subValue) {
+					if !storage.IsExpired(subValue) && !isGroup(subValue) {
 						subKeys = append(subKeys, subKey)
 					}
 				}
@@ -89,9 +91,46 @@ func showAll(data map[string]interface{}) {
 				}
 			}
 		} else {
-			fmt.Printf("%s%s\n", prefix, key)
+			expiry := getExpiryMarker(value)
+			if expiry != "" {
+				fmt.Printf("%s%s %s\n", prefix, key, expiry)
+			} else {
+				fmt.Printf("%s%s\n", prefix, key)
+			}
 		}
 	}
+}
+
+func isGroup(value interface{}) bool {
+	m, ok := value.(map[string]interface{})
+	if !ok {
+		return false
+	}
+	_, hasValue := m["value"]
+	_, hasCiphertext := m["ciphertext"]
+	return !hasValue && !hasCiphertext
+}
+
+func getExpiryMarker(value interface{}) string {
+	if m, ok := value.(map[string]interface{}); ok {
+		if expires, ok := m["expires"].(float64); ok && int64(expires) > 0 {
+			remaining := int64(expires) - time.Now().Unix()
+			if remaining <= 0 {
+				return ""
+			}
+			if remaining < 60 {
+				return fmt.Sprintf("[%ds]", remaining)
+			}
+			if remaining < 3600 {
+				return fmt.Sprintf("[%dm]", remaining/60)
+			}
+			if remaining < 86400 {
+				return fmt.Sprintf("[%dh]", remaining/3600)
+			}
+			return fmt.Sprintf("[%dd]", remaining/86400)
+		}
+	}
+	return ""
 }
 
 func showGroup(group string, data map[string]interface{}) {
