@@ -23,6 +23,7 @@ var setForce bool
 var setSecure bool
 var setPaste bool
 var setDecay string
+var setOnce bool
 
 var SetCmd = &cobra.Command{
 	Use:   "set <key> [value]",
@@ -37,6 +38,7 @@ var SetCmd = &cobra.Command{
 		secure := setSecure
 		paste := setPaste
 		decay := setDecay
+		once := setOnce
 
 		var value string
 
@@ -129,10 +131,11 @@ var SetCmd = &cobra.Command{
 				"ciphertext": encrypted.Ciphertext,
 				"nonce":      encrypted.Nonce,
 				"expires":    float64(expires),
+				"once":       once,
 			}
 			storeEncryptedValue(data, key, force, setValue)
 		} else {
-			storeValueWithExpiry(data, key, value, force, expires)
+			storeValueWithExpiry(data, key, value, force, expires, once)
 		}
 
 		storage.SaveData(data)
@@ -214,10 +217,11 @@ func storeValue(data map[string]interface{}, key string, value string, force boo
 	}
 }
 
-func storeValueWithExpiry(data map[string]interface{}, key string, value string, force bool, expires int64) {
+func storeValueWithExpiry(data map[string]interface{}, key string, value string, force bool, expires int64, once bool) {
 	storedValue := map[string]interface{}{
 		"value":   value,
 		"expires": float64(expires),
+		"once":    once,
 	}
 
 	if strings.Contains(key, "/") {
@@ -335,5 +339,6 @@ func init() {
 	SetCmd.Flags().BoolVarP(&setSecure, "secure", "S", false, "Encrypt this value with a password")
 	SetCmd.Flags().BoolVarP(&setPaste, "paste", "p", false, "Read value from clipboard")
 	SetCmd.Flags().StringVarP(&setDecay, "decay", "d", "", "Set expiration time (e.g., 10h, 5m, 30s)")
+	SetCmd.Flags().BoolVarP(&setOnce, "once", "o", false, "Delete this key after first read")
 	RegisterKeyCompletion(SetCmd)
 }
