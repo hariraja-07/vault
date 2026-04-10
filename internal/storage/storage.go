@@ -111,3 +111,32 @@ func IsEncrypted(value interface{}) bool {
 	}
 	return false
 }
+
+// StoredValue represents a value with expiry metadata
+type StoredValue struct {
+	Value      interface{} `json:"value,omitempty"`
+	Ciphertext string      `json:"ciphertext,omitempty"`
+	Nonce      string      `json:"nonce,omitempty"`
+	Expires    int64       `json:"expires"` // Unix timestamp, 0 = no expiry
+	Once       bool        `json:"once"`    // Delete after first read
+}
+
+// GetExpires returns the expiry timestamp and a boolean indicating if it expires
+func GetExpires(value interface{}) (int64, bool) {
+	if m, ok := value.(map[string]interface{}); ok {
+		if expires, ok := m["expires"].(float64); ok {
+			return int64(expires), expires > 0
+		}
+	}
+	return 0, false
+}
+
+// IsOnce returns true if the value should be deleted after first read
+func IsOnce(value interface{}) bool {
+	if m, ok := value.(map[string]interface{}); ok {
+		if once, ok := m["once"].(bool); ok {
+			return once
+		}
+	}
+	return false
+}
