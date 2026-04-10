@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -31,8 +33,46 @@ var FindCmd = &cobra.Command{
 
 		sort.Strings(matches)
 
-		for i, key := range matches {
-			fmt.Printf("[%d] %s\n", i+1, key)
+		limit := findLimit
+		if limit == 0 {
+			limit = len(matches)
+		}
+
+		displayLimit := 10
+		if limit < 10 {
+			displayLimit = limit
+		}
+
+		shown := 0
+		scanner := bufio.NewScanner(os.Stdin)
+
+		for shown < limit && shown < len(matches) {
+			end := shown + displayLimit
+			if end > limit {
+				end = limit
+			}
+			if end > len(matches) {
+				end = len(matches)
+			}
+
+			for i := shown; i < end; i++ {
+				fmt.Printf("[%d] %s\n", i+1, matches[i])
+			}
+
+			shown = end
+
+			if shown < limit && shown < len(matches) {
+				fmt.Printf("(%d/%d) more (y/N): ", shown, len(matches))
+
+				if !scanner.Scan() {
+					break
+				}
+				response := strings.ToLower(strings.TrimSpace(scanner.Text()))
+
+				if response != "y" && response != "yes" {
+					break
+				}
+			}
 		}
 	},
 }
