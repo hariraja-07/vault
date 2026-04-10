@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.4.0] - 2026-04-10
+
+### Added
+- **Ephemeral secrets** - Set expiry time or delete after first read
+- **`--decay` flag** - Set expiration time (e.g., "10h", "5m", "1 day")
+- **`--once` flag** - Delete key after first read
+- **`vault clean` command** - Remove all expired secrets manually
+- **Expiry markers in list** - Shows `[10h]`, `[5m]`, `[once]` etc.
+
+### Changes
+- Silent auto-cleanup of expired keys on get, list, and find
+- Fixed handling of expired keys in nested groups
+
+### Examples
+```bash
+vault set temp_token "abc" --decay 10h     # expires in 10 hours
+vault set recovery_code "123" --once        # delete after first read
+vault set otp "789" --decay 5m --once       # expires or one-time
+vault clean                               # remove all expired
+```
+
 ## [v0.3.0] - 2026-04-10
 
 ### Added
