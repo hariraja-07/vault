@@ -113,21 +113,30 @@ func isGroup(value interface{}) bool {
 
 func getExpiryMarker(value interface{}) string {
 	if m, ok := value.(map[string]interface{}); ok {
+		remaining := ""
 		if expires, ok := m["expires"].(float64); ok && int64(expires) > 0 {
-			remaining := int64(expires) - time.Now().Unix()
-			if remaining <= 0 {
-				return ""
+			rem := int64(expires) - time.Now().Unix()
+			if rem > 0 {
+				if rem < 60 {
+					remaining = fmt.Sprintf("%ds", rem)
+				} else if rem < 3600 {
+					remaining = fmt.Sprintf("%dm", rem/60)
+				} else if rem < 86400 {
+					remaining = fmt.Sprintf("%dh", rem/3600)
+				} else {
+					remaining = fmt.Sprintf("%dd", rem/86400)
+				}
 			}
-			if remaining < 60 {
-				return fmt.Sprintf("[%ds]", remaining)
-			}
-			if remaining < 3600 {
-				return fmt.Sprintf("[%dm]", remaining/60)
-			}
-			if remaining < 86400 {
-				return fmt.Sprintf("[%dh]", remaining/3600)
-			}
-			return fmt.Sprintf("[%dd]", remaining/86400)
+		}
+		isOnce, _ := m["once"].(bool)
+		if remaining != "" && isOnce {
+			return fmt.Sprintf("[%s][once]", remaining)
+		}
+		if remaining != "" {
+			return fmt.Sprintf("[%s]", remaining)
+		}
+		if isOnce {
+			return "[once]"
 		}
 	}
 	return ""
