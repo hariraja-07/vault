@@ -176,7 +176,7 @@ vault list --full    # Show nested keys
 | `--paste` | `-p` | Read value from clipboard |
 | `--copy` | `-c` | Copy value to clipboard |
 | `--secure` | `-S` | Encrypt the value using AES-256-GCM |
-| `--decay` | `-d` | Set expiration time (e.g., 10h, 5m, 30s, 1d) |
+| `--decay` | `-d` | Set expiration time (e.g., "10h", "5m", "1 day") |
 | `--once` | `-o` | Delete this key after first read |
 | `--force` | `-F` | Force overwrite existing key, group, or subkey |
 | `--full` | `-f` | Show nested keys within groups |
