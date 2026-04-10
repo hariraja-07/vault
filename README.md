@@ -13,6 +13,7 @@
 - **Grouped Organization** — Organize secrets by project (`work/api_key`)
 - **Per-Key Encryption** — Encrypt sensitive values with `--secure` flag using AES-256-GCM
 - **Clipboard Support** — Paste from and copy to clipboard with `-p` and `-c` flags
+- **Fuzzy Search** — Find keys quickly with `vault find`
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
 - **Shell Completion** — Auto-complete commands and keys in Bash, Zsh, Fish, PowerShell, CMD
@@ -115,10 +116,15 @@ vault get api_key -c             # copy to clipboard
 vault get work/              # list keys in group
 vault get work/db_pass       # get specific key in group
 ```
+
+### Find secrets
 ```bash
-vault get api_key
-vault get work/              # list keys in group
-vault get work/db_pass       # get specific key in group
+vault find api                  # fuzzy search for 'api'
+vault find api db               # search multiple terms
+vault find api -s               # interactive selection
+vault find api -g work          # search in specific group
+vault find api -l 10            # limit results
+vault find api -s -c            # select and copy to clipboard
 ```
 
 ### Delete a secret
@@ -143,6 +149,7 @@ vault list --full    # Show nested keys
 | `vault set <key> --paste --secure` | Paste from clipboard and encrypt |
 | `vault get <key>` | Get a secret |
 | `vault get <key> --copy` | Get a secret and copy to clipboard |
+| `vault find <terms...>` | Find keys by fuzzy search |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault list --recent [n]` | List recent keys (default: 10) |
@@ -157,10 +164,13 @@ vault list --full    # Show nested keys
 |------|-------|-------------|
 | `--paste` | `-p` | Read value from clipboard |
 | `--copy` | `-c` | Copy value to clipboard |
-| `--secure` | `-s` | Encrypt the value using AES-256-GCM |
+| `--secure` | `-S` | Encrypt the value using AES-256-GCM |
 | `--force` | `-F` | Force overwrite existing key, group, or subkey |
 | `--full` | `-f` | Show nested keys within groups |
 | `--recent` | - | Show recent keys (use with `list`) |
+| `--select` | `-s` | Interactive selection mode (use with `find`) |
+| `--group` | `-g` | Search in specific group (use with `find`) |
+| `--limit` | `-l` | Limit number of results (use with `find`) |
 
 ### Configuration
 
