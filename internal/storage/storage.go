@@ -165,7 +165,7 @@ func IsOnce(value interface{}) bool {
 // IsExpired checks if a value has expired
 func IsExpired(value interface{}) bool {
 	if expires, ok := GetExpires(value); ok {
-		return time.Now().Unix() > expires
+		return time.Now().Unix() >= expires
 	}
 	return false
 }

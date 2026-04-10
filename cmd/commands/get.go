@@ -55,7 +55,7 @@ var GetCmd = &cobra.Command{
 
 			if m, ok := val.(map[string]interface{}); ok {
 				if expires, ok := m["expires"].(float64); ok && int64(expires) > 0 {
-					if time.Now().Unix() > int64(expires) {
+					if time.Now().Unix() >= int64(expires) {
 						delete(groupMap, subKey)
 						storage.SaveData(data)
 						return
@@ -73,7 +73,7 @@ var GetCmd = &cobra.Command{
 
 			if m, ok := data[key].(map[string]interface{}); ok {
 				if expires, ok := m["expires"].(float64); ok && int64(expires) > 0 {
-					if time.Now().Unix() > int64(expires) {
+					if time.Now().Unix() >= int64(expires) {
 						delete(data, key)
 						storage.SaveData(data)
 						return
