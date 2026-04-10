@@ -9,5 +9,6 @@ func init() {
 	cmd.RootCmd.AddCommand(GetCmd)
 	cmd.RootCmd.AddCommand(RemoveCmd)
 	cmd.RootCmd.AddCommand(ListCmd)
+	cmd.RootCmd.AddCommand(FindCmd)
 	cmd.RootCmd.AddCommand(CompletionCmd)
 }
