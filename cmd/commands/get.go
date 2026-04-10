@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gopasspw/clipboard"
 	"github.com/spf13/cobra"
@@ -27,8 +28,8 @@ var GetCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		data := storage.LoadData()
 		key := args[0]
-
-		var val interface{}
+		var isOnce bool
+		var groupPath string
 
 		if strings.Contains(key, "/") {
 			if strings.Count(key, "/") > 1 {
@@ -39,40 +40,78 @@ var GetCmd = &cobra.Command{
 			parts := strings.SplitN(key, "/", 2)
 			group := parts[0]
 			subKey := parts[1]
+			groupPath = group
 
 			groupMap, ok := data[group].(map[string]interface{})
 			if !ok {
 				fmt.Println("Group not found")
 				return
 			}
-			val, ok = groupMap[subKey]
-			if !ok {
+			if _, ok := groupMap[subKey]; !ok {
 				fmt.Println("Key not found")
 				return
 			}
+			val := groupMap[subKey]
+
+			if m, ok := val.(map[string]interface{}); ok {
+				if expires, ok := m["expires"].(float64); ok && int64(expires) > 0 {
+					if time.Now().Unix() > int64(expires) {
+						delete(groupMap, subKey)
+						storage.SaveData(data)
+						fmt.Println("Error: Key has expired")
+						return
+					}
+				}
+				if once, ok := m["once"].(bool); ok {
+					isOnce = once
+				}
+			}
 		} else {
-			var ok bool
-			val, ok = data[key]
-			if !ok {
+			if _, ok := data[key]; !ok {
 				fmt.Println("Key not found")
 				return
+			}
+
+			if m, ok := data[key].(map[string]interface{}); ok {
+				if expires, ok := m["expires"].(float64); ok && int64(expires) > 0 {
+					if time.Now().Unix() > int64(expires) {
+						delete(data, key)
+						storage.SaveData(data)
+						fmt.Println("Error: Key has expired")
+						return
+					}
+				}
+				if once, ok := m["once"].(bool); ok {
+					isOnce = once
+				}
 			}
 		}
 
+		val := getValue(data, key)
+
 		var result string
 
-		if encryptedVal, ok := val.(map[string]interface{}); ok {
-			password := askPassword("Enter password: ")
-			ev := &crypto.EncryptedValue{
-				Ciphertext: encryptedVal["ciphertext"].(string),
-				Nonce:      encryptedVal["nonce"].(string),
-			}
-			decrypted, err := crypto.Decrypt(ev, password)
-			if err != nil {
-				fmt.Println("Error: Decryption failed. Wrong password?")
+		if m, ok := val.(map[string]interface{}); ok {
+			if _, hasCiphertext := m["ciphertext"]; hasCiphertext {
+				password := askPassword("Enter password: ")
+				ev := &crypto.EncryptedValue{
+					Ciphertext: m["ciphertext"].(string),
+					Nonce:      m["nonce"].(string),
+				}
+				decrypted, err := crypto.Decrypt(ev, password)
+				if err != nil {
+					fmt.Println("Error: Decryption failed. Wrong password?")
+					return
+				}
+				result = decrypted
+			} else if v, ok := m["value"].(string); ok {
+				result = v
+			} else {
+				fmt.Println("Error: Invalid value format")
 				return
 			}
-			result = decrypted
+		} else if s, ok := val.(string); ok {
+			result = s
 		} else {
 			result = fmt.Sprintf("%v", val)
 		}
@@ -85,8 +124,37 @@ var GetCmd = &cobra.Command{
 				return
 			}
 			fmt.Printf("Copied: %s\n", key)
+			if isOnce {
+				deleteKey(data, key, groupPath)
+				storage.SaveData(data)
+				fmt.Printf("%s has been removed (one-time)\n", key)
+			}
+		} else if isOnce {
+			deleteKey(data, key, groupPath)
+			storage.SaveData(data)
+			fmt.Printf("%s has been removed (one-time)\n", key)
 		}
 
 		storage.TrackKeyUsage(key)
 	},
+}
+
+func getValue(data map[string]interface{}, key string) interface{} {
+	if strings.Contains(key, "/") {
+		parts := strings.SplitN(key, "/", 2)
+		group := parts[0]
+		subKey := parts[1]
+		groupMap := data[group].(map[string]interface{})
+		return groupMap[subKey]
+	}
+	return data[key]
+}
+
+func deleteKey(data map[string]interface{}, key string, groupPath string) {
+	if groupPath != "" {
+		groupMap := data[groupPath].(map[string]interface{})
+		delete(groupMap, strings.SplitN(key, "/", 2)[1])
+	} else {
+		delete(data, key)
+	}
 }
