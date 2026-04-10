@@ -72,9 +72,34 @@ var SetCmd = &cobra.Command{
 
 		var expires int64 = 0
 		if decay != "" {
-			duration, err := time.ParseDuration(decay)
-			if err != nil {
-				fmt.Println("Error: Invalid decay format. Use like 10h, 5m, 30s")
+			d := strings.ToLower(decay)
+			d = strings.ReplaceAll(d, " ", "")
+
+			var duration time.Duration
+			var err error
+
+			if strings.HasSuffix(d, "day") || strings.HasSuffix(d, "days") {
+				daysStr := strings.TrimSuffix(d, "days")
+				daysStr = strings.TrimSuffix(daysStr, "day")
+				var days int64
+				_, scanErr := fmt.Sscanf(daysStr, "%d", &days)
+				if scanErr != nil {
+					fmt.Println("Error: Invalid decay format. Use like 10h, 5m, 30s, 1d")
+					return
+				}
+				duration = time.Duration(days) * 24 * time.Hour
+			} else {
+				d = strings.ReplaceAll(d, "hours", "h")
+				d = strings.ReplaceAll(d, "hour", "h")
+				d = strings.ReplaceAll(d, "minutes", "m")
+				d = strings.ReplaceAll(d, "minute", "m")
+				d = strings.ReplaceAll(d, "seconds", "s")
+				d = strings.ReplaceAll(d, "second", "s")
+				duration, err = time.ParseDuration(d)
+			}
+
+			if err != nil || duration <= 0 {
+				fmt.Println("Error: Invalid decay format. Use like 10h, 5m, 30s, 1d")
 				return
 			}
 			expires = time.Now().Add(duration).Unix()
