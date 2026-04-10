@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gopasspw/clipboard"
 	"github.com/spf13/cobra"
@@ -21,6 +22,7 @@ func askPassword(prompt string) string {
 var setForce bool
 var setSecure bool
 var setPaste bool
+var setDecay string
 
 var SetCmd = &cobra.Command{
 	Use:   "set <key> [value]",
@@ -34,6 +36,7 @@ var SetCmd = &cobra.Command{
 		force := setForce
 		secure := setSecure
 		paste := setPaste
+		decay := setDecay
 
 		var value string
 
@@ -67,7 +70,16 @@ var SetCmd = &cobra.Command{
 
 		data := storage.LoadData()
 
-		// Encrypt value if --secure flag is set
+		var expires int64 = 0
+		if decay != "" {
+			duration, err := time.ParseDuration(decay)
+			if err != nil {
+				fmt.Println("Error: Invalid decay format. Use like 10h, 5m, 30s")
+				return
+			}
+			expires = time.Now().Add(duration).Unix()
+		}
+
 		if secure {
 			password := askPassword("Enter password for this key: ")
 			if password == "" {
@@ -91,10 +103,11 @@ var SetCmd = &cobra.Command{
 			setValue := map[string]interface{}{
 				"ciphertext": encrypted.Ciphertext,
 				"nonce":      encrypted.Nonce,
+				"expires":    float64(expires),
 			}
 			storeEncryptedValue(data, key, force, setValue)
 		} else {
-			storeValue(data, key, value, force)
+			storeValueWithExpiry(data, key, value, force, expires)
 		}
 
 		storage.SaveData(data)
@@ -176,6 +189,83 @@ func storeValue(data map[string]interface{}, key string, value string, force boo
 	}
 }
 
+func storeValueWithExpiry(data map[string]interface{}, key string, value string, force bool, expires int64) {
+	storedValue := map[string]interface{}{
+		"value":   value,
+		"expires": float64(expires),
+	}
+
+	if strings.Contains(key, "/") {
+		parts := strings.SplitN(key, "/", 2)
+		group := parts[0]
+		subKey := parts[1]
+
+		if existingGroup, exists := data[group]; exists {
+			if !storage.IsGroup(existingGroup) {
+				if !force {
+					fmt.Printf("Error: Key '%s' already exists.\n", group)
+					fmt.Println("Use --force or -F to overwrite.")
+					return
+				}
+				delete(data, group)
+				fmt.Printf("Warning: overwriting key '%s'\n", group)
+			} else {
+				groupMap := existingGroup.(map[string]interface{})
+				if _, subKeyExists := groupMap[subKey]; subKeyExists {
+					if !force {
+						fmt.Printf("Error: Subkey '%s' already exists in group '%s'.\n", subKey, group)
+						fmt.Println("Use --force or -F to overwrite.")
+						return
+					}
+					fmt.Printf("Warning: overwriting subkey '%s'\n", subKey)
+				}
+			}
+		}
+
+		if _, exists := data[group]; !exists {
+			data[group] = map[string]interface{}{}
+		}
+
+		groupMap := data[group].(map[string]interface{})
+		groupMap[subKey] = storedValue
+	} else {
+		if existingValue, exists := data[key]; exists {
+			if !force {
+				if storage.IsGroup(existingValue) {
+					groupMap := existingValue.(map[string]interface{})
+					count := len(groupMap)
+
+					fmt.Printf("Error: Group '%s' already exists with %d nested key(s).\n", key, count)
+					fmt.Println("Use --force or -F to delete all nested keys and overwrite.")
+					return
+				}
+				fmt.Printf("Error: Key '%s' already exists.\n", key)
+				fmt.Println("Use --force or -F to overwrite.")
+				return
+			}
+
+			if storage.IsGroup(existingValue) {
+				groupMap := existingValue.(map[string]interface{})
+				count := len(groupMap)
+				fmt.Printf("Error: Group '%s' already exists with %d nested key(s).\n", key, count)
+				fmt.Println("Use --force or -F to delete all nested keys and overwrite.")
+				return
+			}
+
+			if storage.IsGroup(existingValue) {
+				groupMap := existingValue.(map[string]interface{})
+				count := len(groupMap)
+				fmt.Printf("Warning: overwriting group '%s' (%d nested key(s) will be deleted)\n", key, count)
+			} else {
+				fmt.Printf("Warning: overwriting key '%s'\n", key)
+			}
+			delete(data, key)
+		}
+
+		data[key] = storedValue
+	}
+}
+
 func storeEncryptedValue(data map[string]interface{}, key string, force bool, encryptedValue map[string]interface{}) {
 	if strings.Contains(key, "/") {
 		parts := strings.SplitN(key, "/", 2)
@@ -219,5 +309,6 @@ func init() {
 	SetCmd.Flags().BoolVarP(&setForce, "force", "F", false, "Force overwrite existing key")
 	SetCmd.Flags().BoolVarP(&setSecure, "secure", "S", false, "Encrypt this value with a password")
 	SetCmd.Flags().BoolVarP(&setPaste, "paste", "p", false, "Read value from clipboard")
+	SetCmd.Flags().StringVarP(&setDecay, "decay", "d", "", "Set expiration time (e.g., 10h, 5m, 30s)")
 	RegisterKeyCompletion(SetCmd)
 }
