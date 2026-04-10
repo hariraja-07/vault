@@ -58,7 +58,27 @@ func LoadData() map[string]interface{} {
 	if err != nil {
 		fmt.Println("Error parsing JSON:", err)
 	}
+
+	migrateData(data)
 	return data
+}
+
+func migrateData(data map[string]interface{}) {
+	for _, value := range data {
+		if m, ok := value.(map[string]interface{}); ok {
+			if _, hasExpires := m["expires"]; !hasExpires {
+				if _, hasCiphertext := m["ciphertext"]; hasCiphertext {
+					m["expires"] = float64(0)
+					m["once"] = false
+				}
+			}
+			if _, hasOnce := m["once"]; !hasOnce {
+				if _, hasCiphertext := m["ciphertext"]; hasCiphertext {
+					m["once"] = false
+				}
+			}
+		}
+	}
 }
 
 func SaveData(data map[string]interface{}) {
