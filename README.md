@@ -13,6 +13,7 @@
 - **Grouped Organization** — Organize secrets by project (`work/api_key`)
 - **Per-Key Encryption** — Encrypt sensitive values with `--secure` flag using AES-256-GCM
 - **Clipboard Support** — Paste from and copy to clipboard with `-p` and `-c` flags
+- **Ephemeral Secrets** — Set expiry time with `--decay` or delete after read with `--once`
 - **Fuzzy Search** — Find keys quickly with `vault find`
 - **JSON Persistence** — Data stored securely in JSON format
 - **ASCII Tree View** — Clean, readable list output
@@ -106,7 +107,10 @@ sudo mv vault /usr/local/bin/
 vault set api_key sk_live_xxxxx
 vault set work/db_pass secret123   # grouped keys
 vault set api_key --paste          # paste from clipboard
-vault set api_key --paste --secure   # paste and encrypt
+vault set api_key --paste --secure  # paste and encrypt
+vault set temp_token "abc" --decay 10h   # expires in 10 hours
+vault set recovery_code "123" --once       # delete after first read
+vault set otp "789" --decay 5m --once   # expires in 5m or after first read
 ```
 
 ### Get a secret
@@ -132,6 +136,11 @@ vault find api -s -c            # select and copy to clipboard
 vault remove api_key
 ```
 
+### Clean expired secrets
+```bash
+vault clean   # remove all expired secrets
+```
+
 ### List all secrets
 ```bash
 vault list
@@ -146,13 +155,15 @@ vault list --full    # Show nested keys
 |---------|-------------|
 | `vault set <key> <value>` | Set a key-value pair |
 | `vault set <key> --paste` | Set value from clipboard |
-| `vault set <key> --paste --secure` | Paste from clipboard and encrypt |
+| `vault set <key> --decay <time>` | Set with expiration (e.g., 10h, 5m, 30s) |
+| `vault set <key> --once` | Set as one-time (deleted after first read) |
 | `vault get <key>` | Get a secret |
 | `vault get <key> --copy` | Get a secret and copy to clipboard |
 | `vault find <terms...>` | Find keys by fuzzy search |
 | `vault remove <key>` | Delete a key or group |
 | `vault list [--full]` | List all secrets |
 | `vault list --recent [n]` | List recent keys (default: 10) |
+| `vault clean` | Remove all expired secrets |
 | `vault config get <key>` | Get a config value |
 | `vault config set <key> <value>` | Set a config value |
 | `vault help` | Show help |
@@ -165,6 +176,8 @@ vault list --full    # Show nested keys
 | `--paste` | `-p` | Read value from clipboard |
 | `--copy` | `-c` | Copy value to clipboard |
 | `--secure` | `-S` | Encrypt the value using AES-256-GCM |
+| `--decay` | `-d` | Set expiration time (e.g., 10h, 5m, 30s, 1d) |
+| `--once` | `-o` | Delete this key after first read |
 | `--force` | `-F` | Force overwrite existing key, group, or subkey |
 | `--full` | `-f` | Show nested keys within groups |
 | `--recent` | - | Show recent keys (use with `list`) |
