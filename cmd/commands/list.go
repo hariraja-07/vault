@@ -63,8 +63,10 @@ func showAll(data map[string]interface{}) {
 			fmt.Printf("%s%s/\n", prefix, key)
 			if listFull {
 				var subKeys []string
-				for subKey := range groupMap {
-					subKeys = append(subKeys, subKey)
+				for subKey, subValue := range groupMap {
+					if !storage.IsExpired(subValue) {
+						subKeys = append(subKeys, subKey)
+					}
 				}
 				sort.Strings(subKeys)
 
