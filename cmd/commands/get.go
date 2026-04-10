@@ -58,7 +58,6 @@ var GetCmd = &cobra.Command{
 					if time.Now().Unix() > int64(expires) {
 						delete(groupMap, subKey)
 						storage.SaveData(data)
-						fmt.Println("Error: Key has expired")
 						return
 					}
 				}
@@ -77,7 +76,6 @@ var GetCmd = &cobra.Command{
 					if time.Now().Unix() > int64(expires) {
 						delete(data, key)
 						storage.SaveData(data)
-						fmt.Println("Error: Key has expired")
 						return
 					}
 				}

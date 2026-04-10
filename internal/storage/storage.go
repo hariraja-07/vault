@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 const vaultFolderName = ".vault"
@@ -159,4 +160,32 @@ func IsOnce(value interface{}) bool {
 		}
 	}
 	return false
+}
+
+// IsExpired checks if a value has expired
+func IsExpired(value interface{}) bool {
+	if expires, ok := GetExpires(value); ok {
+		return time.Now().Unix() > expires
+	}
+	return false
+}
+
+// CleanupExpired removes all expired keys from data (silently)
+func CleanupExpired(data map[string]interface{}) {
+	for key, value := range data {
+		if IsExpired(value) {
+			delete(data, key)
+			continue
+		}
+		if groupMap, ok := value.(map[string]interface{}); ok {
+			for subKey, subValue := range groupMap {
+				if IsExpired(subValue) {
+					delete(groupMap, subKey)
+				}
+			}
+			if len(groupMap) == 0 {
+				delete(data, key)
+			}
+		}
+	}
 }
