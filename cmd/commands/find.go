@@ -26,6 +26,8 @@ var FindCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		data := storage.LoadData()
+		storage.CleanupExpired(data)
+		storage.SaveData(data)
 		terms := args
 
 		matches := findKeys(data, terms, findGroup)

@@ -19,6 +19,8 @@ var ListCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		data := storage.LoadData()
+		storage.CleanupExpired(data)
+		storage.SaveData(data)
 
 		if listRecent {
 			showRecentKeys()
